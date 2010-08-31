@@ -1,0 +1,56 @@
+This is a simple implementation of Doc Tests for Java using Bean Shell. 
+
+Doc Tests offer 4 main advantages:
+
+* tests as example code in the documentation 
+* tests that are very close to the code its testing
+* no need for heavy test set-up
+* tests will never get build and shipped to production
+
+
+See this example class on how its used:
+
+/**
+ * This shows a simple use of Java Doc Test 
+ *
+ * % Example e = new Example()
+ * 
+ */
+public class Example {
+	
+	/**
+	 * @return the answer to life the universe and everything
+	 * 
+	 * % e.getAnswerToLifeUniverseEverything()
+	 * > 42
+	 */
+	public int getAnswerToLifeUniverseEverything(){
+		return 42;
+	}
+	
+	/**
+	 * @return adds 3 numbers
+	 * 
+	 * % e.add(1, 2, 3)
+	 * > 6
+	 * % e.add(1, 7, 3)
+	 * > 11
+	 * % e.add(21, 7, 14)
+	 * > e.getAnswerToLifeUniverseEverything()
+	 */
+	public int add(int a, int b, int c){
+		return a + b + c;
+	}
+	
+	/**
+	 * @return toString representation
+	 * 
+	 * % e.toString()
+	 * > "Super Example Class"
+	 */
+	public String toString(){
+		return "Super Example Class";
+	}
+	
+}
+

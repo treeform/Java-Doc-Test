@@ -11,6 +11,14 @@ import java.util.regex.Pattern;
 import bsh.EvalError;
 import bsh.Interpreter;
 
+/**
+ * This is a simple implementation of Doc Tests for Java using Bean Shell. 
+ * Doc Tests offer 4 main advantages:
+ *  tests as example code in the documentation 
+ *  tests that are very close to the code its testing
+ *  no need for heavy test set-up
+ *  tests will never get build and shipped to production
+ */
 public class DocTest {
 	
 	private ArrayList<TestRun> testRuns;
@@ -20,12 +28,22 @@ public class DocTest {
 		testRuns = new ArrayList<TestRun>();
 	}
 	
-	public void runDocTests(String fileName) throws FileNotFoundException, EvalError{
+	public void runDocTests(String fileName) throws FileNotFoundException {
 		Interpreter interpreter = new Interpreter();
 		// read the file
 		Scanner scanner;
 		scanner = new Scanner(new File(fileName)).useDelimiter("\\Z");
 		String contents = scanner.next();
+		
+		// run the source file first
+		try {
+			interpreter.eval(contents);
+		} catch (EvalError ee) {
+			ee.printStackTrace();
+			System.out.println("Error running file");
+			System.exit(2);
+		}
+		
 		// split the file
 		String[] lines = contents.split("\n");
 		// for each line figure it if its a doc test line		
@@ -47,10 +65,22 @@ public class DocTest {
 					answer = null;
 				}
 				// do interpretation
-				Object result = interpreter.eval(question); 
+				Object result;
+				try {
+					result = interpreter.eval(question);
+				} catch (EvalError e) {
+					// if it errors out lets use the error as result
+					result = e.toString();
+				} 
 				//System.out.println(result);
 				if( answer != null){
-					Object neededResult = interpreter.eval(answer); 
+					Object neededResult;
+					try {
+						neededResult = interpreter.eval(answer);
+					} catch (EvalError e) {
+						// if it errors out lets use the error as result
+						neededResult = e.toString();
+					} 
 					//System.out.println(neededResult);
 					// do testing
 					if( result.toString().equals(neededResult.toString())){
@@ -90,18 +120,20 @@ public class DocTest {
 
 	public static void main(String[] args) {
 		
+		if (args.length != 1) {
+			System.out.println("Expected DocTest.java path/to/source.java");
+			System.exit(1);
+		}
+		
 		DocTest dt = new DocTest();
 		
 		try {
-			dt.runDocTests("src/Example.java");
+			dt.runDocTests(args[0]);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("File "+args[0]+"not found");
+			System.exit(1);
 		}
-		catch (EvalError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		
 		dt.printFooter();
 		
